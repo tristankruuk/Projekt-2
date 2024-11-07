@@ -1,0 +1,72 @@
+
+body {
+	margin: 0;
+	padding: 0;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	text-shadow: 1px 1px #556270;
+	color: #fff;
+}
+canvas {
+	background-color: #eaeaea;
+	height: 100%;
+	width: 100%;
+}
+.points {
+	position: absolute;
+	top: 24px;
+	right: 24px;
+	z-index: 999;
+	margin: 0;
+	padding: 0;
+	font-size: 64px;
+	line-height: 64px;
+}
+.start h2, .again h2, .int h2 {
+	font-family: 'Sacramento', cursive;
+	font-weight: 400;
+	font-size: 72px;
+	line-height: 72px;
+	text-align: center;
+	width: 100%;
+}
+.start, .again, .int {
+	align-items: center;
+	cursor: pointer;
+	display: flex;
+	height: 100%;
+	position: fixed;
+	width: 100%;
+}
+.win {
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 24px;
+}
+.initials {
+	background: none;
+	border: 0;
+	color: #fff;
+	font-size: 22px;
+	font-weight: bold;
+	letter-spacing: 3px;
+	margin: 0 2px 0 -62px;
+	outline: none;
+	padding: 0 2px 0 4px;
+	text-shadow: 1px 1px #556270;
+	text-transform: uppercase;
+	width: 72px;
+}
+.submit {
+	background: #e45f5f;
+	border: 2px solid #C44D58;
+	color: #fff;	
+	font-size: 22px;
+	font-weight: bold;
+	margin: 0 0 0 2px;
+	padding: 6px 16px;
+}
+.hide {
+	display: none;
+}
+.unhide {
+	display: flex;
+}

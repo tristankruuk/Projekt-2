@@ -1,0 +1,65 @@
+.montserrat {
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto; /* Optional: this is supported in modern browsers */
+    font-weight: 400; /* Replace with desired weight, e.g., 400, 500, 600, 700 */
+    font-style: normal; /* Optional: can be "italic" or "normal" */
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	color: #ffffff;
+}
+canvas {
+	background-color: #000000;
+	height: 100%;
+	width: 100%;
+}
+.points {
+	position: absolute;
+	top: 24px;
+	right: 24px;
+	z-index: 999;
+	margin: 0;
+	padding: 0;
+	font-size: 64px;
+	line-height: 64px;
+}
+.start h2, .again h2, .int h2 {
+    font-family: 'Montserrat';
+	font-weight: 600;
+	font-size: 64px;
+	line-height: 64px;
+	text-align: center;
+	width: 100%;
+    text-transform: uppercase;
+}
+.start h3{
+	font-family: 'Open Sans';
+	font-weight: 400;
+	font-size: 32px;
+	line-height: 32px;
+	text-align: center;
+	width: 100%;
+    text-transform: uppercase;
+}
+.start, .again, .int {
+    padding-top: 500px;
+    align-items: center;
+	cursor: pointer;
+	display: flexbox;
+	height: 100%;
+	position: fixed;
+	width: 100%;
+}
+.win {
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 24px;
+}
+.hide {
+	display: none;
+}
+.unhide {
+	display: flex;
+}

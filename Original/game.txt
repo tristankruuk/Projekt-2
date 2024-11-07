@@ -1,0 +1,34 @@
+<html>
+
+<head>
+	<link href="https://fonts.googleapis.com/css2?family=Sacramento&display=swap" rel="stylesheet" type="text/css">
+	<script src="https://code.jquery.com/jquery-latest.min.js"></script>
+	<script src="etc.js"></script>
+	<script src="circle-game.js"></script>
+	<script type='text/javascript'>
+		$(document).ready(function () {
+			if (isCanvasSupported())
+				cg.init()
+			else
+				$(document.body).html("You browser does not support HTML5, which is required to run this game.")
+		})
+	</script>
+	<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+	<h1 class="points"></h1>
+	<div class="start">
+		<h2>Click to Start</h2>
+	</div>
+	<div class="int hide">
+		<h2>Great Score!<br /><span class="win">Enter Your Initials: _____</span><input type="text" name="initials"
+				class="initials" maxlength="3" /><input type="submit" value="Submit" class="submit"></h2>
+	</div>
+	<div class="again hide">
+		<h2>Ouch! Play Again?</h2>
+	</div>
+	<canvas></canvas>
+</body>
+
+</html>
