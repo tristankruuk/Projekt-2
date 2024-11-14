@@ -1,315 +1,216 @@
-var cg = {
-    lastTime: (new Date()).getTime(), config: {
-        autosize: true,
-        circle: {
-            count: 1.75,
-            minRadius: 5,
-            maxRadius: 55,
-            playerRadius: 10,
-            radiusInterval: 10,
-            speedScale: 3,
-            colors: ['#556270', '#4ECDC4', '#C7F464', '#FF6B6B', '#4c5764', '#45b7af', '#b2da59', '#e45f5f']
-        },
-        touchmove: isEventSupported('touchmove')
-    },
-    circles: [],
+let PlayerCreated = false;
+let Player;
+let PlayerSize = 20
+let GameRunning = true
+let Score = 0
 
-    death: function () {
-        pts = cg.player.radius;
-        this.stop();
+const Fullscreen = document.getElementById('Fullscreen')
+const StartingScreen = document.getElementById('StartingScreen');
+const ScoreElement = document.getElementById('ScoreElement');
+ScoreElement.innerText = `${Score}`;
+document.body.appendChild(ScoreElement);
 
-        // Check for High Score
-        var score = pts - cg.config.circle.playerRadius;
-        $.ajax({
-            url: 'scores.php',
-            data: 'chk=1' + '&p=' + score,
-            dataType: 'script',
-            type: 'post',
-            success: function (data) {
-                // If High Score, add Initials
-                if (res == 'true') {
-                    $('.int').addClass('unhide');
-                    $('.initials').focus();
-                    $('.submit').click(function (event) {
-                        event.preventDefault();
 
-                        // Get entered initials
-                        var init = $('.initials').val().toUpperCase();
+// Function to request fullscreen
+function enterFullscreen() {
+    const body = document.body;
+    if (body.requestFullscreen) {
+        body.requestFullscreen();
+    } else if (body.webkitRequestFullscreen) { // Chrome, Safari, Opera
+        body.webkitRequestFullscreen()}}
 
-                        // Remove submit to prevent double clicks
-                        $('.int').removeClass('unhide');
-
-                        // Record via AJAX
-                        $.ajax({
-                            url: 'scores.php',
-                            data: 'int=' + init + '&p=' + score,
-                            dataType: 'html',
-                            type: 'post',
-                            success: function (data) {
-                                $('#scores', window.parent.document).html(data);
-                                cg.start();
-                            }
-                        });
-                    });
-                } else {
-                    $('.again').addClass('unhide');
-                    $('.again').click(function () {
-                        $('.points').text('');
-                        $('.again').removeClass('unhide');
-                        cg.start();  // Restart the game
-                    });
-                }
-            }
+        Fullscreen.addEventListener('click', function () {
+            enterFullscreen(); // Enter fullscreen when clicked
+        
+            // Hide the fullscreen button after clicking
+            Fullscreen.style.display = 'none';
+        
+            // Start the game when fullscreen is activated
+            StartingScreen.style.display = 'none'; // Hide the starting screen
+            GameRunning = true;
+            
+            // Optionally, hide the cursor and start the game logic
+            document.documentElement.style.cursor = 'none';
         });
-    },
-    stop: function () {
-        $(window).unbind('keydown')
-        $(window).unbind('blur')
-        $(document).unbind('touchmove')
-        $(this.canvas).unbind('mousemove')
-        cg.showCursor()
-        this.player = false
-    },
-    start: function () {
-        $(cg.canvas).unbind('click')
-        cg.hideCursor()
-        cg.player = new Player()
-        cg.circles = []
-        if (cg.config.touchmove)
-            $(document).bind('touchmove', cg.touchMove)
-        else
-            $(cg.canvas).mousemove(cg.mouseMove)
-        $(window).keydown(function (e) {
-            if (e.keyCode == 32) {
-                cg.togglePause()
-                e.preventDefault()
-            }
-        })
-    },
-    maxCircles: function () {
-        return Math.round(cg.config.width * cg.config.height / (10 * 1000) / cg.config.circle.count)
-    },
-    hideCursor: function () {
-        $(cg.canvas).css('cursor', 'none')
-    },
-    showCursor: function () {
-        $(cg.canvas).css('cursor', 'default')
-    },
-    pause: function () {
-        if (!this.paused) {
-            cg.showCursor()
-            this.paused = true
-        }
-    },
-    unpause: function () {
-        if (this.paused) {
-            $('.pause').addClass('hide');
-            this.paused = false
-        }
-    },
-    togglePause: function () {
-        if (this.paused)
-            this.unpause()
 
-        else
-            this.pause()
-    },
-    init: function () {
 
-        /* Formatted to Here TMC */
+document.addEventListener('click', function () {
+    StartingScreen.style.display = 'none';
 
-        cg.autosize()
+    if (!GameRunning) { return; }
 
-        this.canvas = $('canvas')
-        this.canvas.attr({ width: this.config.width, height: this.config.height })
-        this.canvas = this.canvas[0]
-        this.ctx = this.canvas.getContext('2d')
+    // Loob mängija ainult ühe korra
+    if (!PlayerCreated) {
+        Player = document.createElement('div');
+        Player.classList.add('Player');
+        Player.style.width = `${PlayerSize}px`;
+        Player.style.height = `${PlayerSize}px`;
 
-        for (var i = this.circles.length; i < cg.maxCircles(); i++)
-            this.circles[i] = new Circle(true)
+        // Muutused 'body' sees
+        document.body.appendChild(Player);
+        document.documentElement.style.cursor = 'none';
 
-        $('.start').click(function (e) {
-            $(cg.canvas).unbind('click')
-            $('.start').addClass('hide')
-            cg.start()
-        })
+        PlayerCreated = true;
+        let GameRunning = true;
 
-        this.tick()
-    },
-    inZBounds: function (x, y) {
-        return (x > cg.zLogoX &&
-            x < cg.zLogoX + cg.zWidth &&
-            y > cg.zLogoY &&
-            y < cg.zLogoY + cg.zHeight)
-    },
-    autosize: function () {
-        if (cg.config.autosize) {
-            cg.config.width = window.innerWidth
-            cg.config.height = window.innerHeight
-            $(cg.canvas).attr({ width: cg.config.width, height: cg.config.height })
-        }
-    },
-    tick: function () {
-        now = (new Date()).getTime()
-        window.elapsed = now - cg.lastTime
-        cg.lastTime = now
+    }
 
-        requestAnimFrame(cg.tick)
+    // Jälgib hiire liikumist
+    document.addEventListener('mousemove', function (event) {
+        const mouseX = event.clientX;
+        const mouseY = event.clientY;
 
-        cg.autosize()
+        // Paneb mängija hiire keskele
+        Player.style.left = `${mouseX - 10}px`;
+        Player.style.top = `${mouseY - 10}px`;
+    });
+});
 
-        cg.ctx.clearRect(0, 0, cg.config.width, cg.config.height)
 
-        if (cg.paused) {
-            for (var i = 0; i < cg.circles.length; i++)
-                if (cg.circles[i])
-                    if (cg.circles[i].render())
-                        i--
+function createRandomCircle() {
+    if (!GameRunning || !Player) return;
+
+
+    const Circle = document.createElement('div');
+    Circle.classList.add('Circle')
+
+    // Pallide randomizer. Suurus, horisontaal, vertikaal. 
+    const size = Math.random() * 50 + 10;
+    const startPosX = Math.random() * window.innerWidth;
+    const startPosY = Math.random() * window.innerHeight;
+
+    // Random side selection for circle start position (left, right, top, bottom)
+    const side = Math.floor(Math.random() * 4);  // 0: left, 1: right, 2: top, 3: bottom
+
+    let startX, startY, endX, endY;
+    let directionX = 0;
+    let directionY = 0;
+
+    // Liikumised
+    if (side === 0) { // Vasakult
+        startX = -size; // Algus vasakult
+        startY = Math.random() * window.innerHeight;
+        endX = window.innerWidth + size; // Lõpp paremal
+        directionX = 1;
+        directionY = Math.random() * 2 - 1; // Suvaline vertikaalne liikumine
+    } 
+    
+    else if (side === 1) { // Paremalt
+        startX = window.innerWidth + size;
+        startY = Math.random() * window.innerHeight;
+        endX = -size;
+        directionX = -1;
+        directionY = Math.random() * 2 - 1;
+    } 
+    
+    else if (side === 2) { // Ülevalt
+        startX = Math.random() * window.innerWidth;
+        startY = -size; // Algus ülevalt
+        endY = window.innerHeight + size; // Lõpp all
+        directionX = Math.random() * 2 - 1; // Suvaline horisontaalne liikumine
+        directionY = 1;
+    } 
+    
+    else { // Altpoolt
+        startX = Math.random() * window.innerWidth;
+        startY = window.innerHeight + size; 
+        endY = -size; 
+        directionX = Math.random() * 2 - 1; 
+        directionY = -1;
+    }
+
+    // .css JavaScripti sees
+    Circle.style.width = `${size}px`;
+    Circle.style.height = `${size}px`;
+    Circle.style.left = `${startX}px`;
+    Circle.style.top = `${startY}px`;
+    document.body.appendChild(Circle);
+
+    // Animatsiooni loop
+    function animateCircle() {
+        // Muudab positsiooni
+        const currentX = parseFloat(Circle.style.left);
+        const currentY = parseFloat(Circle.style.top);
+
+        // Uuendab positsiooni
+        Circle.style.left = `${currentX + directionX}px`;
+        Circle.style.top = `${currentY + directionY}px`;
+
+
+               // Collision detection: Check if the player collides with the circle
+               const PlayerRect = Player.getBoundingClientRect();
+               const CircleRect = Circle.getBoundingClientRect();
+       
+               const PlayerCenterX = PlayerRect.left + PlayerRect.width / 2;
+               const PlayerCenterY = PlayerRect.top + PlayerRect.height / 2;
+               const CircleCenterX = CircleRect.left + CircleRect.width / 2;
+               const CircleCenterY = CircleRect.top + CircleRect.height / 2;
+       
+               const distance = Math.sqrt(
+                   Math.pow(PlayerCenterX - CircleCenterX, 2) + Math.pow(PlayerCenterY - CircleCenterY, 2)
+               );
+       
+               const PlayerRadius = PlayerSize / 2;
+               const CircleRadius = size / 2;
+       
+               // If player collides with a smaller circle (eating it)
+               if (distance < PlayerRadius + CircleRadius && size < PlayerSize) {
+                   Score++;
+                   PlayerSize += 1; // Increase player size
+                   Player.style.width = `${PlayerSize}px`;
+                   Player.style.height = `${PlayerSize}px`;
+                   ScoreElement.innerText = `${Score}`;
+                   Circle.remove();
+               }
+       
+               // If player collides with a larger circle (restart)
+               if (distance < PlayerRadius + CircleRadius && size > PlayerSize) {
+                   gameOver(); // Restart the game
+               }
+
+
+        // Kas pall on jõudnud lõppu?
+        if (
+            (side === 0 && currentX > endX) ||
+            (side === 1 && currentX < endX) ||
+            (side === 2 && currentY > endY) ||
+            (side === 3 && currentY < endY)
+        ) {
+            // Palli kustutamine
+            Circle.remove();
         } else {
-            if (cg.circles.length < cg.maxCircles() && Math.random() < 0.25)
-                cg.circles.push(new Circle())
-
-            for (var i = 0; i < cg.circles.length; i++)
-                if (cg.circles[i])
-                    if (cg.circles[i].tick())
-                        i--
+            // Palli edasi liigutamine
+            requestAnimationFrame(animateCircle);
         }
-        if (typeof (cg.player) != 'undefined' && cg.player)
-            cg.player.tick()
+    }
 
-    },
-    touchMove: function (e) {
-        e.preventDefault()
-        var touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0]
-        cg.mouseMove(touch)
-    },
-    mouseMove: function (e) {
-        if (!cg.paused) {
-            cg.player.x = e.clientX
-            cg.player.y = e.clientY
-        }
-    },
+    // Animatsiooni alustamine
+    animateCircle();
 }
-var Circle = function (inCenter) {
-    min = cg.config.circle.minRadius
-    max = cg.config.circle.maxRadius
 
-    if (typeof (cg.player) != 'undefined' && cg.player) {
-        if (min < cg.player.radius - 35)
-            min = cg.player.radius - 35
-        if (max < cg.player.radius + 15)
-            max = cg.player.radius + 15
-    }
-    this.radius = rand(min, max, cg.config.circle.radiusInterval)
-    this.color = cg.config.circle.colors[Math.floor(Math.random() * cg.config.circle.colors.length)]
+// Function to reset the game (when player hits a larger circle)
+function gameOver() {
+    GameRunning = false; // Stop the game
+    alert("Game Over! Your final score is: " + Score);
+    // Reset player size and position
+    PlayerSize = 30;
+    Score = 0;
+    ScoreElement.innerText = `${Score}`;
+    Player.style.width = `${PlayerSize}px`;
+    Player.style.height = `${PlayerSize}px`;
 
-    if (inCenter) {
-        this.x = Math.random() * cg.config.width
-        this.y = Math.random() * cg.config.height
-        this.vx = Math.random() - .5
-        this.vy = Math.random() - .5
-    } else {
-        r = Math.random()
-        if (r <= .25) {
-            this.x = 1 - this.radius
-            this.y = Math.random() * cg.config.height
-            this.vx = Math.random()
-            this.vy = Math.random() - .5
-        } else if (r > .25 && r <= .5) {
-            this.x = cg.config.width + this.radius - 1
-            this.y = Math.random() * cg.config.height
-            this.vx = - Math.random()
-            this.vy = Math.random() - .5
-        } else if (r > .5 && r <= .75) {
-            this.x = Math.random() * cg.config.height
-            this.y = 1 - this.radius
-            this.vx = Math.random() - .5
-            this.vy = Math.random()
-        } else {
-            this.x = Math.random() * cg.config.height
-            this.y = cg.config.height + this.radius - 1
-            this.vx = Math.random() - .5
-            this.vy = - Math.random()
-        }
-    }
-    this.vx *= cg.config.circle.speedScale
-    this.vy *= cg.config.circle.speedScale
-    if (Math.abs(this.vx) + Math.abs(this.vy) < 1) {
-        this.vx = this.vx < 0 ? -1 : 1
-        this.vy = this.vy < 0 ? -1 : 1
-    }
+    // Optionally, reset the player's position and other game state
+    Player.style.left = `50%`;
+    Player.style.top = `50%`;
 
-    this.tick = function () {
-        if (!this.inBounds()) {
-            for (var i = 0; i < cg.circles.length; i++)
-                if (cg.circles[i].x == this.x && cg.circles[i].y == this.y) {
-                    cg.circles.splice(i, 1)
-                    return true
-                }
-        } else {
-            this.move()
-            this.render()
-        }
-    }
+    const circles = document.querySelectorAll('.Circle');
+    circles.forEach(circle => circle.remove());
 
-    this.inBounds = function () {
-        if (this.x + this.radius < 0 ||
-            this.x - this.radius > cg.config.width ||
-            this.y + this.radius < 0 ||
-            this.y - this.radius > cg.config.height)
-            return false
-        else
-            return true
-    }
-
-    this.move = function () {
-        this.x += this.vx * elapsed / 15
-        this.y += this.vy * elapsed / 15
-    }
-
-    this.render = function () {
-        cg.ctx.beginPath()
-        cg.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
-        cg.ctx.fillStyle = this.color
-        cg.ctx.closePath()
-        cg.ctx.fill()
-    }
-
-    this.render()
+    // Start the game again
+    setTimeout(() => {
+        GameRunning = true;
+    }, 1000); // Delay before restarting
 }
-var Player = function () {
-    this.x = cg.config.width / 2
-    this.y = cg.config.height / 2
-    this.color = 'white'
-    this.radius = cg.config.circle.playerRadius
-    this.tick = function () {
-        this.detectCollision()
-        this.render()
-    }
-    var points = 0
-    this.detectCollision = function () {
-        for (var i = 0; i < cg.circles.length; i++) {
-            circle = cg.circles[i]
-            dist = Math.pow(Math.pow(circle.x - this.x, 2) + Math.pow(circle.y - this.y, 2), .5)
-            if (dist < circle.radius + this.radius) {
-                if (circle.radius > this.radius) {
-                    cg.death()
-                } else {
-                    points = points + 1
-                    this.radius++
-                    cg.circles.splice(i, 1)
-                    i--
-                    $('.points').text(points);
-                }
-            }
-        }
-    }
-    this.render = function () {
-        cg.ctx.beginPath()
-        cg.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
-        cg.ctx.fillStyle = '#fff'
-        cg.ctx.closePath()
-        cg.ctx.fill()
 
-    }
-}
+// Funktsiooni kordumine
+setInterval(createRandomCircle, 500);

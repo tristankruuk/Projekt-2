@@ -1,65 +1,69 @@
 .montserrat {
-    font-family: "Montserrat", sans-serif;
-    font-optical-sizing: auto; /* Optional: this is supported in modern browsers */
-    font-weight: 400; /* Replace with desired weight, e.g., 400, 500, 600, 700 */
-    font-style: normal; /* Optional: can be "italic" or "normal" */
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: weight;
+  font-style: normal;
 }
 
-body {
-	margin: 0;
-	padding: 0;
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-	color: #ffffff;
+body{
+    background-color: black;
+    cursor: default;
+    overflow: hidden;
 }
-canvas {
-	background-color: #000000;
-	height: 100%;
-	width: 100%;
+
+.Circle{
+    border-radius: 50%;
+    background-color: aqua;
+    position: absolute;
 }
-.points {
-	position: absolute;
-	top: 24px;
-	right: 24px;
-	z-index: 999;
-	margin: 0;
-	padding: 0;
-	font-size: 64px;
-	line-height: 64px;
+
+.Player{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border-radius: 50%;
+    pointer-events: none;
 }
-.start h2, .again h2, .int h2 {
+
+#StartingScreen{
+    display: flex;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#ScoreElement{
+    display: flex;
+    position: absolute;
+    top: 0%;
+    left: auto;
+    right: 3%;
+}
+
+h1{
+    font-family: Montserrat;
+    text-transform: uppercase;
+    padding: auto;
+    color: #fdffff;
+}
+
+#Fullscreen{
+    display: flex;
+    position: absolute;
+    top:auto;
+    bottom: 3%;
+    left: auto;
+    right: 3%;
+
+    height: 40px;
+    width: 150px;
     font-family: 'Montserrat';
-	font-weight: 600;
-	font-size: 64px;
-	line-height: 64px;
-	text-align: center;
-	width: 100%;
-    text-transform: uppercase;
-}
-.start h3{
-	font-family: 'Open Sans';
-	font-weight: 400;
-	font-size: 32px;
-	line-height: 32px;
-	text-align: center;
-	width: 100%;
-    text-transform: uppercase;
-}
-.start, .again, .int {
-    padding-top: 500px;
-    align-items: center;
-	cursor: pointer;
-	display: flexbox;
-	height: 100%;
-	position: fixed;
-	width: 100%;
-}
-.win {
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-	font-size: 24px;
-}
-.hide {
-	display: none;
-}
-.unhide {
-	display: flex;
+    font-weight: 700;
+    font-size: 20px;
+    color: #fdffff;
+    background-color: black;
+    border-color: rgb(255, 255, 255);
 }
