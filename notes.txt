@@ -1,0 +1,30 @@
+15. NOVEMBER 2024 -----------------------------------------------------------------------------------------------------------------------------------
+
+
+> Glitch, kus kui piisavalt suur oled, ja nurka lähed, siis suurened liiga kiiresti
+--> Lahendus: Teha nii, et ei saa täiesti äärde minna
+--> NB! Millegipärast ainult üleval vasakus nurgas.
+
+> Teha lobby moodi asi. Starting Screen ja Ending Screen sama, aga erineva tekstiga.
+--> Leaderboard
+--> Fullscreen nupp
+--> Tekst 
+
+> Muutused ringidel.
+--> Muuta ringide suurus mängija suurusest sõltuvaks: +/- 10 või +/- 5
+--> Muuta ringide kiirust erinevaks.
+--> Muuta ringide värvid erinevaks.
+
+> Lisada koodi seletavad kommentaarid
+--> Muuta inglisk => eestik
+
+> Parandada .css välimust
+
+
+__. NOVEMBER 2024 -----------------------------------------------------------------------------------------------------------------------------------
+
+
+*tekst*
+
+
+__ KUUPÄEV 202_ -------------------------------------------------------------------------------------------------------------------------------------

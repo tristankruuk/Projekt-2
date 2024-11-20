@@ -1,11 +1,11 @@
-let PlayerCreated = false;
-let PlayerSize = 20;
+let PlayerCreated;
 let Player;
-let ScoreElement;
+let PlayerSize = 20;
 let Score = 0;
 let GameRunning = false;
-let GameOver = false;
-const Fullscreen = document.getElementById('Fullscreen');
+
+const Fullscreen = document.getElementsByClassName('fullscreen');
+const StartingScreen = document.getElementById('startingScreen');
 
 
 // Funktsioonid
@@ -13,66 +13,77 @@ const Fullscreen = document.getElementById('Fullscreen');
 
 function EnterFullscreen() {
     const body = document.body;
-    if (body.requestFullscreen) { body.requestFullscreen(); }
-    else if (body.webkitRequestFullscreen) { body.webkitRequestFullscreen(); }
+    if (body.requestFullscreen) { body.requestFullscreen() } 
+    else if (body.webkitRequestFullscreen) { body.webkitRequestFullscreen() }
 }
 
-function StartGame() {
+function startGame() {
+    // Create player
     if (!PlayerCreated) {
-        // Create the Player element and use the global Player variable
-        Player = document.createElement('div');
-        document.body.appendChild(Player);
+        let Player = document.createElement('div');
         Player.classList.add('Player');
         Player.style.width = `${PlayerSize}px`;
         Player.style.height = `${PlayerSize}px`;
-        
-        // Hide the cursor
-        document.documentElement.style.cursor = 'none';
-        
-        // Mark Player as created
+
+        // Add the player to the body
+        document.body.appendChild(Player);
+        document.documentElement.style.cursor = 'none'; // Hide the cursor
         PlayerCreated = true;
-
-        // Create and display the score element
-        ScoreElement = document.createElement('h1');
-        ScoreElement.classList.add('ScoreElement');
-        document.body.appendChild(ScoreElement);
-        ScoreElement.innerText = "0";  // Initialize score
-
-        StartingScreen.style.display = 'none'
-        EndingScreen.style.display = 'none'
-
-        setInterval(CreateRandomCircle, 500);
-
-        GameRunning = true
+        let ScoreElement = document.createElement('h1')
+        ScoreElement.classList.ass('ScoreElement')
     }
+
+    // Hide starting screen and fullscreen button
+    StartingScreen.style.display = 'none';
+    Fullscreen.style.display = 'none'; // Hide fullscreen button
+
+    // Start creating random circles
+    setInterval(createRandomCircle, 500);
+
+    // Start the game
+    GameRunning = true;
 }
 
+
+// Function to handle game over
 function gameOver() {
-    GameRunning = false; 
-    GameOver = true;  
+    GameRunning = false;   
     
     const circles = document.querySelectorAll('.Circle');
     circles.forEach(circle => circle.remove());
 
     Player.remove();
-    
-    document.getElementById('EndingScreen').style.display = 'block';
 
-    const endingText = document.getElementById('EndingText');
-    endingText.innerText = `Sinu tulemus oli ${Score}`;
-
+    // Reset player size and position
     Score = 0;
+    ScoreElement.innerText = `${Score}`;
     Player.style.width = `${PlayerSize}px`;
     Player.style.height = `${PlayerSize}px`;
 
+    // Reset the player's position and other game state
     Player.style.left = `50%`;
     Player.style.top = `50%`;
 
+    // Remove all circles
+
+
     Fullscreen.style.display = 'block';
-    ScoreElement.style.display = 'none';
+    StartingScreen.style.display = 'block';
 }
 
-function CreateRandomCircle () {
+document.addEventListener('keydown', function(event) {
+    // Check if the pressed key is the spacebar (key code "Space")
+    if (event.code === 'Space' && !GameRunning) {
+        startGame();  // Call startGame function
+
+        // Hide the cursor
+        document.body.style.cursor = 'none';
+    }
+});
+
+
+
+function CreateRandomCircles () {
     if (!GameRunning || !Player) return;
 
     // Loob palli
@@ -182,35 +193,18 @@ function CollisionCheck(Circle, size) {
 }
 
 
-// Eventide kuulajad
+// EventListenerid
+
+
+document.addEventListener('mousemove', function (event) {
+    const mouseX = event.clientX;
+    const mouseY = event.clientY;
+
+    Player.style.left = `${mouseX - 10}px`;
+    Player.style.top = `${mouseY - 10}px`;
+});
 
 
 Fullscreen.addEventListener('click', function () {
     EnterFullscreen();
-    Fullscreen.style.display = 'none';
 });
-
-document.addEventListener('mousemove', function (event) {
-    if (Player) {
-        const mouseX = event.clientX;
-        const mouseY = event.clientY;
-
-        // Move the player based on mouse position, adjusted for its size
-        Player.style.left = `${mouseX - PlayerSize / 2}px`;
-        Player.style.top = `${mouseY - PlayerSize / 2}px`;
-    }
-});
-
-document.addEventListener('keydown', function(event) {
-    if (event.code === 'Space') {
-        if (!GameRunning || GameOver) {
-            StartGame();        // Start the game if it's not running or game is over
-            GameRunning = true; // Set the game as running
-            GameOver = false; // Reset the game over flag
-        }
-        
-        // Hide the cursor whether the game is starting or already running
-        document.body.style.cursor = 'none';  
-    }
-});
-
